@@ -9,23 +9,27 @@ const config = {
 };
 
 const app = express();
-app.use(express.json());
+app.use(express.json()); // ★これ絶対必要！
 
 app.post('/callback', line.middleware(config), (req, res) => {
+  const events = req.body.events;
   const client = new line.Client(config);
+
   Promise
-    .all(req.body.events.map(event => {
+    .all(events.map(event => {
       if (event.type === 'message' && event.message.type === 'text') {
         return client.replyMessage(event.replyToken, {
           type: 'text',
           text: event.message.text
         });
+      } else {
+        return Promise.resolve(null); // その他イベントは無視して成功扱い
       }
     }))
-    .then(() => res.end())
+    .then(() => res.status(200).end()) // ★ ちゃんと 200 を返す！
     .catch(err => {
-      console.error(err);
-      res.status(500).end();
+      console.error('Callback error:', err); // ログ残す
+      res.status(200).end(); // ★ 失敗でも200返してLINEが切らないように
     });
 });
 
