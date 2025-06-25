@@ -3,6 +3,10 @@
 const express = require('express');
 const line = require('@line/bot-sdk');
 
+
+// 🔽 この行を追加！
+console.log('DEBUG - CHANNEL_SECRET:', process.env.CHANNEL_SECRET);
+
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET
