@@ -11,9 +11,8 @@ const config = {
 console.log('DEBUG - CHANNEL_SECRET:', process.env.CHANNEL_SECRET);
 
 const app = express();
-app.use(express.json());
 
-// ✅ 署名検証つきに戻す！
+// ✅ express.json() は使わない or 使うなら `/callback` 以外で！
 app.post('/callback', line.middleware(config), async (req, res) => {
   const events = req.body.events;
   const client = new line.Client(config);
