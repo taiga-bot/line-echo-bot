@@ -11,19 +11,12 @@ const config = {
 console.log('DEBUG - CHANNEL_SECRET:', process.env.CHANNEL_SECRET);
 
 const app = express();
-app.use(express.json()); // JSONパース
+app.use(express.json());
 
-// ★ ミドルウェアなしで検証せずに受け取る！
-app.post('/callback', async (req, res) => {
-  console.log('DEBUG - Incoming body:', JSON.stringify(req.body)); // ← リクエスト確認
-
-  const client = new line.Client(config);
+// ✅ 署名検証つきに戻す！
+app.post('/callback', line.middleware(config), async (req, res) => {
   const events = req.body.events;
-
-  if (!events || events.length === 0) {
-    console.log('No events received');
-    return res.status(200).end();
-  }
+  const client = new line.Client(config);
 
   try {
     await Promise.all(events.map(event => {
@@ -33,11 +26,12 @@ app.post('/callback', async (req, res) => {
           text: event.message.text
         });
       }
+      return Promise.resolve(null);
     }));
     res.status(200).end();
   } catch (err) {
     console.error('Callback error:', err);
-    res.status(200).end(); // LINEにとって200ならOK
+    res.status(200).end();
   }
 });
 
