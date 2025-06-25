@@ -3,38 +3,42 @@
 const express = require('express');
 const line = require('@line/bot-sdk');
 
-
-// 🔽 この行を追加！
-console.log('DEBUG - CHANNEL_SECRET:', process.env.CHANNEL_SECRET);
-
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET
 };
 
+console.log('DEBUG - CHANNEL_SECRET:', process.env.CHANNEL_SECRET);
+
 const app = express();
-app.use(express.json()); // ★これ絶対必要！
+app.use(express.json()); // JSONパース
 
-app.post('/callback', line.middleware(config), (req, res) => {
-  const events = req.body.events;
+// ★ ミドルウェアなしで検証せずに受け取る！
+app.post('/callback', async (req, res) => {
+  console.log('DEBUG - Incoming body:', JSON.stringify(req.body)); // ← リクエスト確認
+
   const client = new line.Client(config);
+  const events = req.body.events;
 
-  Promise
-    .all(events.map(event => {
+  if (!events || events.length === 0) {
+    console.log('No events received');
+    return res.status(200).end();
+  }
+
+  try {
+    await Promise.all(events.map(event => {
       if (event.type === 'message' && event.message.type === 'text') {
         return client.replyMessage(event.replyToken, {
           type: 'text',
           text: event.message.text
         });
-      } else {
-        return Promise.resolve(null); // その他イベントは無視して成功扱い
       }
-    }))
-    .then(() => res.status(200).end()) // ★ ちゃんと 200 を返す！
-    .catch(err => {
-      console.error('Callback error:', err); // ログ残す
-      res.status(200).end(); // ★ 失敗でも200返してLINEが切らないように
-    });
+    }));
+    res.status(200).end();
+  } catch (err) {
+    console.error('Callback error:', err);
+    res.status(200).end(); // LINEにとって200ならOK
+  }
 });
 
 const port = process.env.PORT || 3000;
