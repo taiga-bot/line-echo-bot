@@ -28,7 +28,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
           const [, name, date, start, end] = match;
 
           // ✅ GASに送信（GASのWebアプリURLに置き換えてね）
-          await axios.post('https://script.google.com/macros/s/あなたのGASのURL/exec', {
+          await axios.post('https://script.google.com/macros/s/AKfycbyOGeC92p1zzV7Au5p04Z1Eo9YqL6IhY4NIEnYpyvvKf31w-vY0fbnZ3So5pNQz_eSR/exec', {
             name, date, start, end
           });
 
