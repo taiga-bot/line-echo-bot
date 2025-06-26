@@ -22,7 +22,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
     await Promise.all(events.map(async (event) => {
       if (event.type === 'message' && event.message.type === 'text') {
         const msg = event.message.text;
-        const match = msg.match(/^"(.+?)"\s+(\d{1,2}\/\d{1,2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})$/));
+        const match = msg.match(/^"(.+?)"\s+(\d{1,2}\/\d{1,2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})$/);
 
         if (match) {
           const [, name, date, start, end] = match;
