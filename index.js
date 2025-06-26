@@ -2,6 +2,7 @@
 
 const express = require('express');
 const line = require('@line/bot-sdk');
+const axios = require('axios');
 
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
