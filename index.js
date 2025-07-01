@@ -59,7 +59,8 @@ app.post('/callback', line.middleware(config), async (req, res) => {
     }
 
     // ステップ③：日付と時間を受け取ってGASに送信
-    const timeMatch = msg.match(/^(\d{1,2}\/\d{1,2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})$/);
+    const timeMatch = msg.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
+
     if (timeMatch) {
       const [, date, start, end] = timeMatch;
       const name = currentUsers[userId]?.name;
