@@ -22,7 +22,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
 
     // ステップ①：「シフト入力」で名前選択ボタンを送信
     if (msg === 'シフト入力') {
-      const names = ['辰廣大河', '山内ゆうき', '佐藤まい'];
+      const names = ['辰廣 大河', '山内 ゆうき', '佐藤 まい'];
       const buttons = names.map(name => ({
         type: 'button',
         action: {
