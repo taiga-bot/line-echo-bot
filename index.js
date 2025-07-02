@@ -71,18 +71,18 @@ app.post('/callback', line.middleware(config), async (req, res) => {
           text: '⚠️ 先に「シフト入力」から名前を選んでください。'
         });
       }
-
-      await axios.post('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec', {
+      try {
+        await axios.post('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec', {
         name, date, start, end
       });
 
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: `✅ ${date} のシフト希望を登録しました！（${name}）`
-      })
+       return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: `✅ ${date} のシフト希望を登録しました！（${name}）`
+       });
     } catch (error) {
       console.error('🚨 GASへの送信に失敗:', error.response?.data || error.message);
-    
+
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: `⚠️ 登録に失敗しました。店長に連絡してください。`
