@@ -72,7 +72,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
         });
       }
 
-      await axios.post('https://script.google.com/macros/s/AKfycbyOGeC92p1zzV7Au5p04Z1Eo9YqL6IhY4NIEnYpyvvKf31w-vY0fbnZ3So5pNQz_eSR/exec', {
+      await axios.post('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec', {
         name, date, start, end
       });
 
