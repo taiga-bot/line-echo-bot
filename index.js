@@ -79,6 +79,13 @@ app.post('/callback', line.middleware(config), async (req, res) => {
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: `✅ ${date} のシフト希望を登録しました！（${name}）`
+      })
+    } catch (error) {
+      console.error('🚨 GASへの送信に失敗:', error.response?.data || error.message);
+    
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: `⚠️ 登録に失敗しました。店長に連絡してください。`
       });
     }
 
