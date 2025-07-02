@@ -20,33 +20,45 @@ app.post('/callback', line.middleware(config), async (req, res) => {
     const msg = event.message.text;
     const userId = event.source.userId;
 
-    // ステップ①：「シフト入力」で名前選択ボタンを送信
-    if (msg === 'シフト入力') {
-      const names = ['辰廣 大河', '山内 うき', '佐藤 まい'];
-      const buttons = names.map(name => ({
-        type: 'button',
-        action: {
-          type: 'message',
-          label: name,
-          text: `名前:${name}`
-        }
-      }));
+// ステップ①：「シフト入力」で名前選択ボタンを送信
+if (msg === 'シフト入力') {
+  try {
+    // ✅ スプレッドシート（GAS）から名前一覧を取得
+    const response = await axios.get('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec');
+    const names = response.data.names;
 
-      const flexMessage = {
-        type: 'flex',
-        altText: '従業員を選んでください',
-        contents: {
-          type: 'bubble',
-          body: {
-            type: 'box',
-            layout: 'vertical',
-            contents: buttons
-          }
-        }
-      };
+    const buttons = names.map(name => ({
+      type: 'button',
+      action: {
+        type: 'message',
+        label: name,
+        text: `名前:${name}`
+      }
+    }));
 
-      return client.replyMessage(event.replyToken, flexMessage);
-    }
+    const flexMessage = {
+      type: 'flex',
+      altText: '従業員を選んでください',
+      contents: {
+        type: 'bubble',
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: buttons
+        }
+      }
+    };
+
+    return client.replyMessage(event.replyToken, flexMessage);
+  } catch (error) {
+    console.error('🚨 名前一覧取得エラー:', error.response?.data || error.message);
+
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: '⚠️ 名前一覧の取得に失敗しました。'
+    });
+  }
+}
 
     // ステップ②：名前を選んだら保存し、日付と時間入力を促す
     if (msg.startsWith('名前:')) {
