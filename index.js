@@ -22,7 +22,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
 
     // ステップ①：「シフト入力」で名前選択ボタンを送信
     if (msg === 'シフト入力') {
-      const names = ['辰廣 大河', '山内 ゆうき', '佐藤 まい'];
+      const names = ['辰廣大河', '山内ゆうき', '佐藤まい'];
       const buttons = names.map(name => ({
         type: 'button',
         action: {
@@ -60,7 +60,6 @@ app.post('/callback', line.middleware(config), async (req, res) => {
 
     // ステップ③：日付と時間を受け取ってGASに送信
     const timeMatch = msg.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
-
     if (timeMatch) {
       const [, date, start, end] = timeMatch;
       const name = currentUsers[userId]?.name;
@@ -71,22 +70,24 @@ app.post('/callback', line.middleware(config), async (req, res) => {
           text: '⚠️ 先に「シフト入力」から名前を選んでください。'
         });
       }
+
       try {
         await axios.post('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec', {
-        name, date, start, end
-      });
+          name, date, start, end
+        });
 
-       return client.replyMessage(event.replyToken, {
+        return client.replyMessage(event.replyToken, {
           type: 'text',
           text: `✅ ${date} のシフト希望を登録しました！（${name}）`
-       });
-    } catch (error) {
-      console.error('🚨 GASへの送信に失敗:', error.response?.data || error.message);
+        });
+      } catch (error) {
+        console.error('🚨 GASへの送信に失敗:', error.response?.data || error.message);
 
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: `⚠️ 登録に失敗しました。店長に連絡してください。`
-      });
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: `⚠️ 登録に失敗しました。店長に連絡してください。`
+        });
+      }
     }
 
     // その他のメッセージ：エラー表示
