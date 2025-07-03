@@ -27,6 +27,7 @@ if (msg === 'シフト入力') {
     // ✅ スプレッドシート（GAS）から名前一覧を取得
     const response = await axios.get('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec');
     const names = response.data.names;
+    console.log('▶ response.data:', response.data); 
 
     currentUsers[userId] = { names, page: 1 };
 
