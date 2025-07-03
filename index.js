@@ -25,7 +25,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
 if (msg === 'シフト入力') {
   try {
     // ✅ スプレッドシート（GAS）から名前一覧を取得
-    const response = await axios.get('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec');
+    const response = await axios.get('https://script.google.com/macros/s/AKfycbxPNSb2FsHe0a79UoI-7NUFtl7nABXAN-hmqasFx933Y7e2nTRsT6ZD6eQrXnS1I7k/exec');
     const names = response.data.names;
     console.log('▶ response.data:', response.data); 
 
@@ -80,7 +80,7 @@ if (msg === 'シフト入力') {
       }
 
       try {
-        await axios.post('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec', {
+        await axios.post('https://script.google.com/macros/s/AKfycbxPNSb2FsHe0a79UoI-7NUFtl7nABXAN-hmqasFx933Y7e2nTRsT6ZD6eQrXnS1I7k/exec', {
           name, date, start, end
         });
 
