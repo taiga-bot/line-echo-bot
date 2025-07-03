@@ -9,6 +9,7 @@ const config = {
 };
 
 const app = express();
+const PAGE_SIZE = 10;
 const currentUsers = {}; // ユーザーID → 名前 保存
 
 app.post('/callback', line.middleware(config), async (req, res) => {
@@ -27,48 +28,42 @@ if (msg === 'シフト入力') {
     const response = await axios.get('https://script.google.com/macros/s/AKfycby5ayJcWGyTUOFXKMIliW3L3j70XTnlxumdpNnHughNVgsKvOO_80wJiQvqD3HswS8/exec');
     const names = response.data.names;
 
-    const buttons = names.map(name => ({
-      type: 'button',
-      action: {
-        type: 'message',
-        label: name,
-        text: `名前:${name}`
-      }
-    }));
+    currentUsers[userId] = { names, page: 1 };
 
-    const flexMessage = {
-      type: 'flex',
-      altText: '従業員を選んでください',
-      contents: {
-        type: 'bubble',
-        body: {
-          type: 'box',
-          layout: 'vertical',
-          contents: buttons
-        }
-      }
-    };
-
-    return client.replyMessage(event.replyToken, flexMessage);
+    const sliced = names.slice(0, PAGE_SIZE);
+    return client.replyMessage(event.replyToken, createFlexMessage(sliced, 1, names.length));
   } catch (error) {
     console.error('🚨 名前一覧取得エラー:', error.response?.data || error.message);
-
     return client.replyMessage(event.replyToken, {
       type: 'text',
       text: '⚠️ 名前一覧の取得に失敗しました。'
     });
   }
 }
+    
+    // ✅ 「次へ N」→ 次ページを表示
+    if (msg.startsWith('次へ ')) {
+      const page = parseInt(msg.replace('次へ ', ''), 10);
+      const names = currentUsers[userId]?.names || [];
+      const start = (page - 1) * PAGE_SIZE;
+      const sliced = names.slice(start, start + PAGE_SIZE);
 
-    // ステップ②：名前を選んだら保存し、日付と時間入力を促す
+      currentUsers[userId].page = page;
+      return client.replyMessage(event.replyToken, createFlexMessage(sliced, page, names.length));
+    }
+
+    // ✅ 名前を選択 → セッション保存
     if (msg.startsWith('名前:')) {
       const name = msg.replace('名前:', '');
-      currentUsers[userId] = { name };
+      currentUsers[userId] = { ...currentUsers[userId], name };
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: `${name} さん、日付と時間を入力してください（例：7/15 9:00-13:00）`
       });
     }
+  
+
+  
 
     // ステップ③：日付と時間を受け取ってGASに送信
     const timeMatch = msg.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
@@ -111,6 +106,43 @@ if (msg === 'シフト入力') {
 
   res.status(200).end();
 });
+
+// ✅ Flexメッセージ生成関数（10件＋次へボタン）
+function createFlexMessage(nameList, page, totalCount) {
+  const buttons = nameList.map(name => ({
+    type: 'button',
+    action: {
+      type: 'message',
+      label: name,
+      text: `名前:${name}`
+    }
+  }));
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  if (page < totalPages) {
+    buttons.push({
+      type: 'button',
+      action: {
+        type: 'message',
+        label: `次へ ${page + 1}`,
+        text: `次へ ${page + 1}`
+      }
+    });
+  }
+
+  return {
+    type: 'flex',
+    altText: `名前を選んでください（${page}ページ目）`,
+    contents: {
+      type: 'bubble',
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        contents: buttons
+      }
+    }
+  };
+}
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
