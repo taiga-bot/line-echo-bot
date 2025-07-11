@@ -66,37 +66,41 @@ if (msg === 'シフト入力') {
 
   
 
-    // ステップ③：日付と時間を受け取ってGASに送信
-    const timeMatch = msg.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
-    if (timeMatch) {
-      const [, date, start, end] = timeMatch;
-      const name = currentUsers[userId]?.name;
+    // ステップ③：複数行のシフト日程を処理
+const lines = msg.split('\n').filter(line => line.trim());
+const isAllShifts = lines.every(line => /^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/.test(line));
 
-      if (!name) {
-        return client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: '⚠️ 先に「シフト入力」から名前を選んでください。'
-        });
-      }
+if (isAllShifts && lines.length > 0) {
+  const name = currentUsers[userId]?.name;
 
-      try {
-        await axios.post('https://script.google.com/macros/s/AKfycbxPNSb2FsHe0a79UoI-7NUFtl7nABXAN-hmqasFx933Y7e2nTRsT6ZD6eQrXnS1I7k/exec', {
-          name, date, start, end
-        });
+  if (!name) {
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: '⚠️ 先に「シフト入力」から名前を選んでください。'
+    });
+  }
 
-        return client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: `✅ ${date} のシフト希望を登録しました！（${name}）`
-        });
-      } catch (error) {
-        console.error('🚨 GASへの送信に失敗:', error.response?.data || error.message);
-
-        return client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: `⚠️ 登録に失敗しました。店長に連絡してください。`
-        });
-      }
+  try {
+    for (const line of lines) {
+      const [, date, start, end] = line.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
+      await axios.post('https://script.google.com/macros/s/AKfycbxPNSb2FsHe0a79UoI-7NUFtl7nABXAN-hmqasFx933Y7e2nTRsT6ZD6eQrXnS1I7k/exec', {
+        name, date, start, end
+      });
     }
+
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: `✅ ${lines.length}件のシフト希望を登録しました！（${name}）`
+    });
+  } catch (error) {
+    console.error('🚨 複数登録失敗:', error.response?.data || error.message);
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: '⚠️ シフト登録中にエラーが発生しました。店長に連絡してください。'
+    });
+  }
+}
+
 
     // その他のメッセージ：エラー表示
     return client.replyMessage(event.replyToken, {
