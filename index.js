@@ -57,16 +57,19 @@ if (msg === 'シフト入力') {
     if (msg.startsWith('名前:')) {
       const name = msg.replace('名前:', '');
       currentUsers[userId] = { ...currentUsers[userId], name };
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: `${name} さん、日付と時間を入力してください（例：7/15 9:00-13:00）`
-      });
+      return client.replyMessage(event.replyToken, [
+        {
+          type: 'text',
+          text: `${name} さん、希望のシフトを入力してください！\n📋 コピペで複数行まとめて送信もOKです`
+        },
+        {
+          type: 'text',
+          text: `例：\n7/15 9:00-13:00\n7/16 10:00-14:00\n7/18 17:00-21:00`
+        }
+      ]);
     }
   
-
-  
-
-    // ステップ③：複数行のシフト日程を処理
+ // ステップ③：複数行のシフト日程を処理
 const lines = msg.split('\n').filter(line => line.trim());
 const isAllShifts = lines.every(line => /^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/.test(line));
 
