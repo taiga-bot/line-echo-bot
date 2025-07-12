@@ -17,19 +17,6 @@ app.post('/callback', line.middleware(config), async (req, res) => {
   const client = new line.Client(config);
 
   await Promise.all(req.body.events.map(async (event) => {
-    // イベント処理本体（略）
-  }));
-
-  res.status(200).end();
-});
-
-
-
-// app.post('/callback', line.middleware(config), async (req, res) => {
-//   console.log('🟢 LINEからPOSTを受信しました');
-//   const client = new line.Client(config);
-
-  await Promise.all(req.body.events.map(async (event) => {
     if (event.type !== 'message' || event.message.type !== 'text') return;
 
     const msg = event.message.text;
