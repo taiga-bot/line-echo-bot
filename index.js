@@ -25,7 +25,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
 if (msg === 'シフト入力') {
   try {
     // ✅ スプレッドシート（GAS）から名前一覧を取得
-    const response = await axios.get('https://script.google.com/macros/s/AKfycbzPyX7MWIT3VISCwX6wAFYQj2xGEVq1U2bz-HZ6pL4nd6wqJ34wLt4PIgX8GAnHvuPM/exec');
+    const response = await axios.get('https://script.google.com/macros/s/AKfycbxxiYFTn93iTPZMGj56VYOejs1pxGnrjZlgwafh28-4XHKZ40683e-fV3_3o0ifq4vz/exec');
     const names = response.data.names;
     console.log('▶ response.data:', response.data); 
 
@@ -86,7 +86,7 @@ if (isAllShifts && lines.length > 0) {
   try {
     for (const line of lines) {
       const [, date, start, end] = line.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
-      await axios.post('https://script.google.com/macros/s/AKfycbzPyX7MWIT3VISCwX6wAFYQj2xGEVq1U2bz-HZ6pL4nd6wqJ34wLt4PIgX8GAnHvuPM/exec', {
+      await axios.post('https://script.google.com/macros/s/AKfycbxxiYFTn93iTPZMGj56VYOejs1pxGnrjZlgwafh28-4XHKZ40683e-fV3_3o0ifq4vz/exec', {
         name, date, start, end
       });
     }
