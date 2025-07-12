@@ -112,7 +112,7 @@ if (isAllShifts && lines.length > 0) {
   
     return client.replyMessage(event.replyToken, {
       type: 'text',
-      text: '⚠️ シフト登録中にエラーが発生しましたよ。店長に連絡してください。'
+      text: '⚠️ シフト登録中にエラーが発生しました。店長に連絡してください。'
     });
   }
  }
