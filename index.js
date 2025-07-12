@@ -86,6 +86,9 @@ if (isAllShifts && lines.length > 0) {
   try {
     for (const line of lines) {
       const [, date, start, end] = line.match(/^(\d{1,2}\/\d{1,2})\s*([0-9]{1,2}:[0-9]{2})-([0-9]{1,2}:[0-9]{2})$/);
+
+    　 // ✅ ここで送信データをログ出力
+      console.log('📤 axios送信内容:', { name, date, start, end });
       await axios.post('https://script.google.com/macros/s/AKfycbwCkAVVilUd9B9z2TtlsV-BzkgiJxYpKdifqeyBWLR3UfCgSeVhbe9qMq1djlMAGhlk/exec', {
         name, date, start, end
       });
