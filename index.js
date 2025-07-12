@@ -95,15 +95,27 @@ if (isAllShifts && lines.length > 0) {
       type: 'text',
       text: `✅ ${lines.length}件のシフト希望を登録しました！（${name}）`
     });
-  } catch (error) {
-    console.error('🚨 複数登録失敗:', error.response?.data || error.message);
-    console.log('🧪 エラー詳細（フルログ）:', JSON.stringify(error, null, 2));
+    } catch (error) {
+    const safeError = error || {};
+    const message = safeError.message || '不明なエラー';
+    const raw = safeError.response?.data || '(response dataなし)';
+  
+    console.error('🚨 複数登録失敗:', message);
+    console.error('📦 レスポンス内容:', raw);
+  
+    // JSON.stringifyは try-catchで囲む
+    try {
+      console.log('🧪 フルログ:', JSON.stringify(safeError, null, 2));
+    } catch (jsonErr) {
+      console.error('⚠️ JSON変換失敗:', jsonErr.message);
+    }
+  
     return client.replyMessage(event.replyToken, {
       type: 'text',
       text: '⚠️ シフト登録中にエラーが発生しましたよ。店長に連絡してください。'
     });
   }
-}
+ }
 
 
     // その他のメッセージ：エラー表示
