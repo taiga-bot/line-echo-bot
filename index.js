@@ -12,11 +12,14 @@ const app = express();
 const PAGE_SIZE = 10;
 const currentUsers = {}; // ユーザーID → 名前 保存
 
-// app.post('/callback', line.middleware(config), async (req, res) => {
-app.post('/callback', async (req, res) => {
-  console.log('🟢 LINEからPOSTを受信しました（middlewareなし）');
+// ✅ OK例
+app.post('/callback', line.middleware(config), async (req, res) => {
+  await Promise.all(req.body.events.map(async (event) => {
+    // 処理
+  }));
   res.status(200).end();
 });
+
 
 // app.post('/callback', line.middleware(config), async (req, res) => {
 //   console.log('🟢 LINEからPOSTを受信しました');
