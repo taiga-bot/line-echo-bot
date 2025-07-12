@@ -35,6 +35,7 @@ if (msg === 'シフト入力') {
     return client.replyMessage(event.replyToken, createFlexMessage(sliced, 1, names.length));
   } catch (error) {
     console.error('🚨 名前一覧取得エラー:', error.response?.data || error.message);
+    console.log('🧪 エラー詳細（フルログ）:', JSON.stringify(error, null, 2));
     return client.replyMessage(event.replyToken, {
       type: 'text',
       text: '⚠️ 名前一覧の取得に失敗しました。'
